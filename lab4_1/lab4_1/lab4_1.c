@@ -16,14 +16,14 @@ typedef struct letter_counter
 LETTER_COUNTER;
 
 void bubble_sort(LETTER_COUNTER *, int);
-void inc(LETTER_COUNTER *, char[]);		// this one is incorrect too (same problem, plus it counts EOS)
+void inc(LETTER_COUNTER *, char[]);		// this one is incorrect too (same problem, plus it counts EOS) // fixed!
 int get_count(LETTER_COUNTER *, char);	
 int get_total(char[]);					// this one is incorrect (counts non-alphabet characters)
 
 int main()
 {
 	LETTER_COUNTER counter = {{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}, {0}, 0};
-	char text_str[]="abbcccddddeeeeeffffffggggggghhhhhhhhiiiiiiiii";
+	char text_str[]="abbcccddddeeeeeffffffggggggghhhhhhhhiiiiiiiii 1";
 	int index = 0;
 	char *starString;
 	unsigned int stringLength, i;		// for the starString
@@ -35,7 +35,7 @@ int main()
 	printf("Text under investigation is :\n");
 	puts(text_str);
 	printf("------------------------------------------------------\n");
-	printf("The text contains %d characters.\n", get_total(text_str));
+	printf("The text contains %d characters.\n", counter.total_num_of_letters);
 	printf("\t  1234567890123456789012345678901234567890\n");
 	bubble_sort(&counter, ARSIZE);
 	while(index < ARSIZE)
@@ -61,10 +61,13 @@ int main()
 
 void inc(LETTER_COUNTER *counter, char string[])
 {
+	unsigned char isValid = 1; // this prevents counter increasing for non-alphabet characters
+	unsigned int index = 0;		// for cycling
 	enum alphabet{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z};
-	while(string[counter->total_num_of_letters] != '\0')
+
+	while(string[index] != '\0')
 	{
-		switch(string[counter->total_num_of_letters])
+		switch(string[index])
 		{
 			case 'a':
 			case 'A':
@@ -171,9 +174,13 @@ void inc(LETTER_COUNTER *counter, char string[])
 				counter->counter_per_letter[z]++;
 				break;
 			default:
+				isValid = 0;
 				break;
 		}
-		counter->total_num_of_letters++;
+		if(isValid)
+			counter->total_num_of_letters++;
+		isValid = 1;
+		index++;
 	}
 }
 int get_count(LETTER_COUNTER *counter, char letter)
