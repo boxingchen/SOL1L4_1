@@ -5,7 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ARSIZE 26
+#define ARSIZE 26		// alphabet length
+#define ASCII_OFFSET 32 // offset of the capital letters from the lowercase ones
 
 typedef struct letter_counter
 {
@@ -15,172 +16,74 @@ typedef struct letter_counter
 }
 LETTER_COUNTER;
 
-void bubble_sort(LETTER_COUNTER *, int);
-void inc(LETTER_COUNTER *, char[]);		// this one is incorrect too (same problem, plus it counts EOS) // fixed!
+void bubble_sort(LETTER_COUNTER *, int);		// prototypes
+void inc(LETTER_COUNTER *, char[]);
 int get_count(LETTER_COUNTER *, char);	
-int get_total(char[]);					// this one is incorrect (counts non-alphabet characters)
+int get_total(char[]);
 
 int main()
 {
-	LETTER_COUNTER counter = {{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}, {0}, 0};
-	char text_str[]="abbcccddddeeeeeffffffggggggghhhhhhhhiiiiiiiii 1";
-	int index = 0;
-	char *starString;
-	unsigned int stringLength, i;		// for the starString
+	LETTER_COUNTER counter = {{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}, {0}, 0}; // initialize our structure
+	char text_str[]="abc!_ ABC";											// the sting of text to analyse
+	int index = 0;															// used in printing the result
+	char *starString;														// used in printing the result
+	unsigned int stringLength, i;											// for the starString
 
-	inc(&counter, text_str);
-	get_count(&counter, 'b');
+	inc(&counter, text_str);												// call the inc function to fill counter with data
+	printf("get count for \"b\" returned %d\n", get_count(&counter, 'b'));  // check if this function works correctly
 	
 	printf("\n------------------------------------------------------\n");
 	printf("Text under investigation is :\n");
 	puts(text_str);
 	printf("------------------------------------------------------\n");
 	printf("The text contains %d characters.\n", counter.total_num_of_letters);
+	printf("get_total function counted %d characters.\n", get_total(text_str));
 	printf("\t  1234567890123456789012345678901234567890\n");
-	bubble_sort(&counter, ARSIZE);
-	while(index < ARSIZE)
-	{
-		if(counter.counter_per_letter[index] == 0)
+	bubble_sort(&counter, ARSIZE);											// sort the array
+	while(index < ARSIZE)													// this cycle prints number of occurances for each letter (stars)
+	{																		// I used memory allocation just to remember how it's done
+		if(counter.counter_per_letter[index] == 0)							// don't print anything if the letter was never encountered
 			break;
 		i = 0;
 		stringLength = counter.counter_per_letter[index] + 1;				// +1 so the \0 fits
-		starString = (char *) malloc(sizeof(char) * stringLength);
-		while(i < (stringLength - 1))
+		starString = (char *) malloc(sizeof(char) * stringLength);			// allocate memory to place the string of asterisks
+		while(i < (stringLength - 1))										// fill it with asterisks
 		{
 			starString[i] = '*';
 			i++;
 		}
-		starString[(stringLength - 1)] = '\0';
-		printf("letter %c :%s\n", counter.letter[index], starString);
-		free(starString);
+		starString[(stringLength - 1)] = '\0';								// append EOS to the asterisk string
+		printf("letter %c :%s\n", counter.letter[index], starString);		// print the string
+		free(starString);													// free the memory
 		index++;
 	}
+
 	system("pause");
 	return 0;
 }
 
 void inc(LETTER_COUNTER *counter, char string[])
 {
-	unsigned char isValid = 1; // this prevents counter increasing for non-alphabet characters
-	unsigned int index = 0;		// for cycling
-	enum alphabet{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z};
+	int i = 0;								// letter array index
+	int j = 0;								// string index
+	char capital;							// for convenience
 
-	while(string[index] != '\0')
+	while(string[i] != '\0')
 	{
-		switch(string[index])
+		while(j < ARSIZE)
 		{
-			case 'a':
-			case 'A':
-				counter->counter_per_letter[a]++;
-				break;
-			case 'b':
-			case 'B':
-				counter->counter_per_letter[b]++;
-				break;
-			case 'c':
-			case 'C':
-				counter->counter_per_letter[c]++;
-				break;
-			case 'd':
-			case 'D':
-				counter->counter_per_letter[d]++;
-				break;
-			case 'e':
-			case 'E':
-				counter->counter_per_letter[e]++;
-				break;
-			case 'f':
-			case 'F':
-				counter->counter_per_letter[f]++;
-				break;
-			case 'g':
-			case 'G':
-				counter->counter_per_letter[g]++;
-				break;
-			case 'h':
-			case 'H':
-				counter->counter_per_letter[h]++;
-				break;
-			case 'i':
-			case 'I':
-				counter->counter_per_letter[i]++;
-				break;
-			case 'j':
-			case 'J':
+			capital = (char) (counter->letter[j] - ASCII_OFFSET); // I'm using the fact that capital letters are offset from lowercase ones by 32 (dec)
+			if(counter->letter[j] == string[i] || capital == string[i]) 
+			{
 				counter->counter_per_letter[j]++;
-				break;
-			case 'k':
-			case 'K':
-				counter->counter_per_letter[k]++;
-				break;
-			case 'l':
-			case 'L':
-				counter->counter_per_letter[l]++;
-				break;
-			case 'm':
-			case 'M':
-				counter->counter_per_letter[m]++;
-				break;
-			case 'n':
-			case 'N':
-				counter->counter_per_letter[n]++;
-				break;
-			case 'o':
-			case 'O':
-				counter->counter_per_letter[o]++;
-				break;
-			case 'p':
-			case 'P':
-				counter->counter_per_letter[p]++;
-				break;
-			case 'q':
-			case 'Q':
-				counter->counter_per_letter[q]++;
-				break;
-			case 'r':
-			case 'R':
-				counter->counter_per_letter[r]++;
-				break;
-			case 's':
-			case 'S':
-				counter->counter_per_letter[s]++;
-				break;
-			case 't':
-			case 'T':
-				counter->counter_per_letter[t]++;
-				break;
-			case 'u':
-			case 'U':
-				counter->counter_per_letter[u]++;
-				break;
-			case 'v':
-			case 'V':
-				counter->counter_per_letter[v]++;
-				break;
-			case 'w':
-			case 'W':
-				counter->counter_per_letter[w]++;
-				break;
-			case 'x':
-			case 'X':
-				counter->counter_per_letter[x]++;
-				break;
-			case 'y':
-			case 'Y':
-				counter->counter_per_letter[y]++;
-				break;
-			case 'z':
-			case 'Z':
-				counter->counter_per_letter[z]++;
-				break;
-			default:
-				isValid = 0;
-				break;
+				counter->total_num_of_letters++;
+				j++;
+				break;						// terminate the inner loop once we have a match
+			}
+			j++;
 		}
-		if(isValid)
-			counter->total_num_of_letters++;
-		isValid = 1;
-		index++;
+		j = 0;								// reset the inner loop index
+		i++;
 	}
 }
 int get_count(LETTER_COUNTER *counter, char letter)
@@ -197,13 +100,32 @@ int get_count(LETTER_COUNTER *counter, char letter)
 	}
 	return 0;
 }
+
 int get_total(char string[])
 {
-	unsigned int index = 0;
+	char alphabet[ARSIZE] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+	unsigned int index = 0;			// string index
+	unsigned int i = 0;				// alphabet array index
+	unsigned int total = 0;			// total number of letter in the string
+	char capital;					// convenience
 	while(string[index] != '\0')
+	{
+		i = 0;
+		while(i < ARSIZE)
+		{
+			capital = (char) (alphabet[i] - ASCII_OFFSET);
+			if(string[index] == alphabet[i] || string[index] == capital)
+			{
+				total++;
+				break;
+			}
+			i++;
+		}
 		index++;
-	return index;
+	}
+	return total;
 }
+
 void bubble_sort(LETTER_COUNTER *counter, int dimension)
 { 
 	int ready, i, intTemp;
@@ -219,7 +141,7 @@ void bubble_sort(LETTER_COUNTER *counter, int dimension)
 				counter->counter_per_letter[i] = counter->counter_per_letter[i+1];
 				counter->counter_per_letter[i+1] = intTemp;
 
-				charTemp = counter->letter[i];
+				charTemp = counter->letter[i];										// I swap the letters in the alphabet array so we can get the correct output when printing astesisks
 				counter->letter[i] = counter->letter[i+1];
 				counter->letter[i+1] = charTemp;
 
